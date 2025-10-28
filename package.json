@@ -1,21 +1,26 @@
 {
   "name": "mood-checkin-api",
   "version": "1.0.0",
-  "description": "EmergencyyCall - Mood Check-In API (Express + SQLite)",
-  "main": "src/index.js",
+  "description": "Mood Check-In API (EmergencyyCall case assessment) built with Node.js + Express + MySQL",
+  "main": "src/app.js",
   "type": "module",
   "scripts": {
-    "dev": "node src/index.js",
-    "init:db": "node src/index.js --init-db"
+    "dev": "node --watch src/app.js",
+    "start": "NODE_ENV=production node src/app.js",
+    "lint": "echo \"(Optional) Add ESLint config if needed\""
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
-    "better-sqlite3": "^9.6.0",
     "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "express-rate-limit": "^7.3.1",
+    "express-rate-limit": "^7.4.0",
     "helmet": "^7.1.0",
+    "joi": "^17.12.3",
     "morgan": "^1.10.0",
-    "zod": "^3.23.8"
+    "mysql2": "^3.11.3"
   }
 }
