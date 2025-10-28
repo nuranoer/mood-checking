@@ -1,0 +1,730 @@
+{
+	"info": {
+		"_postman_id": "3a775160-96a2-4279-90a0-c70eb5a22026",
+		"name": "Mood Check-In API",
+		"description": "Postman collection for Mood Check-In API (Node.js + MySQL)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49451148",
+		"_collection_link": "https://fitrizuyina014-9272583.postman.co/workspace/Fitri-Zuyina-Nur-Azizah's-Works~03e271d4-ea07-44dd-86c3-57f3299c64b7/collection/49451148-3a775160-96a2-4279-90a0-c70eb5a22026?action=share&source=collection_link&creator=49451148"
+	},
+	"item": [
+		{
+			"name": "Healthcheck",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"pm.test('Response has ok:true', function () {",
+							"  const json = pm.response.json();",
+							"  pm.expect(json.ok).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{API_URL}}/health",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Healthcheck",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{API_URL}}/health",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [
+						{
+							"key": "Content-Security-Policy",
+							"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+						},
+						{
+							"key": "Cross-Origin-Opener-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Cross-Origin-Resource-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Origin-Agent-Cluster",
+							"value": "?1"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "no-referrer"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=15552000; includeSubDomains"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-DNS-Prefetch-Control",
+							"value": "off"
+						},
+						{
+							"key": "X-Download-Options",
+							"value": "noopen"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "X-Permitted-Cross-Domain-Policies",
+							"value": "none"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "RateLimit-Policy",
+							"value": "300;w=900"
+						},
+						{
+							"key": "RateLimit",
+							"value": "limit=300, remaining=299, reset=900"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "72"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"48-ny8L902yvcKJswO/+SVau5kM5Mk\""
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 28 Oct 2025 03:31:38 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"ok\": true,\n    \"service\": \"mood-checkin-api\",\n    \"ts\": \"2025-10-28T03:31:38.107Z\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Create/Upsert Daily Mood",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Ensure DATE is set to today if empty",
+							"if (!pm.environment.get('DATE')) {",
+							"  const d = new Date();",
+							"  const iso = d.toISOString().slice(0,10);",
+							"  pm.environment.set('DATE', iso);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status is 201', function () {",
+							"  pm.response.to.have.status(201);",
+							"});",
+							"pm.test('Success true', function () {",
+							"  const json = pm.response.json();",
+							"  pm.expect(json.success).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-api-key",
+						"value": "{{API_KEY}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"user_id\": \"{{USER_ID}}\",\n  \"date\": \"{{DATE}}\",\n  \"mood_score\": 4,\n  \"mood_label\": \"calm\",\n  \"notes\": \"Had a productive day\"\n}"
+				},
+				"url": {
+					"raw": "{{API_URL}}/mood",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"mood"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Create/Upsert Daily Mood",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "x-api-key",
+								"value": "{{API_KEY}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": \"{{USER_ID}}\",\n  \"date\": \"{{DATE}}\",\n  \"mood_score\": 4,\n  \"mood_label\": \"calm\",\n  \"notes\": \"Had a productive day\"\n}"
+						},
+						"url": {
+							"raw": "{{API_URL}}/mood",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"mood"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "",
+					"header": [
+						{
+							"key": "Content-Security-Policy",
+							"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+						},
+						{
+							"key": "Cross-Origin-Opener-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Cross-Origin-Resource-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Origin-Agent-Cluster",
+							"value": "?1"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "no-referrer"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=15552000; includeSubDomains"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-DNS-Prefetch-Control",
+							"value": "off"
+						},
+						{
+							"key": "X-Download-Options",
+							"value": "noopen"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "X-Permitted-Cross-Domain-Policies",
+							"value": "none"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "RateLimit-Policy",
+							"value": "300;w=900"
+						},
+						{
+							"key": "RateLimit",
+							"value": "limit=300, remaining=299, reset=900"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "23"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"17-Qi7MZbX4pcDw6bv9udftYkO+4/M\""
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 28 Oct 2025 03:55:42 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"id\": 1\n}"
+				}
+			]
+		},
+		{
+			"name": "List Mood History",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Default FROM/TO to current month if not set",
+							"const now = new Date();",
+							"const y = now.getUTCFullYear();",
+							"const m = (now.getUTCMonth()+1).toString().padStart(2,'0');",
+							"pm.environment.set('FROM', pm.environment.get('FROM') || `${y}-${m}-01`);",
+							"pm.environment.set('TO', pm.environment.get('TO') || new Date(Date.UTC(y, now.getUTCMonth()+1, 0)).toISOString().slice(0,10));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status is 200', () => pm.response.to.have.status(200));",
+							"const json = pm.response.json();",
+							"pm.test('Has pagination keys', () => {",
+							"  pm.expect(json).to.have.property('page');",
+							"  pm.expect(json).to.have.property('per_page');",
+							"  pm.expect(json).to.have.property('total');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{API_KEY}}"
+					}
+				],
+				"url": {
+					"raw": "{{API_URL}}/mood/{{USER_ID}}?from={{FROM}}&to={{TO}}&page=1&per_page=10",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"mood",
+						"{{USER_ID}}"
+					],
+					"query": [
+						{
+							"key": "from",
+							"value": "{{FROM}}"
+						},
+						{
+							"key": "to",
+							"value": "{{TO}}"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "per_page",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "List Mood History",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{API_KEY}}"
+							}
+						],
+						"url": {
+							"raw": "{{API_URL}}/mood/{{USER_ID}}?from={{FROM}}&to={{TO}}&page=1&per_page=10",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"mood",
+								"{{USER_ID}}"
+							],
+							"query": [
+								{
+									"key": "from",
+									"value": "{{FROM}}"
+								},
+								{
+									"key": "to",
+									"value": "{{TO}}"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [
+						{
+							"key": "Content-Security-Policy",
+							"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+						},
+						{
+							"key": "Cross-Origin-Opener-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Cross-Origin-Resource-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Origin-Agent-Cluster",
+							"value": "?1"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "no-referrer"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=15552000; includeSubDomains"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-DNS-Prefetch-Control",
+							"value": "off"
+						},
+						{
+							"key": "X-Download-Options",
+							"value": "noopen"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "X-Permitted-Cross-Domain-Policies",
+							"value": "none"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "RateLimit-Policy",
+							"value": "300;w=900"
+						},
+						{
+							"key": "RateLimit",
+							"value": "limit=300, remaining=298, reset=820"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "268"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"10c-o4lkwXj5WTOFE0hvDr5nBp5RzuU\""
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 28 Oct 2025 03:57:03 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"page\": 1,\n    \"per_page\": 10,\n    \"total\": 1,\n    \"data\": [\n        {\n            \"id\": 1,\n            \"user_id\": \"user_123\",\n            \"date\": \"2025-10-28T00:00:00.000Z\",\n            \"mood_score\": 4,\n            \"mood_label\": \"calm\",\n            \"notes\": \"Had a productive day\",\n            \"created_at\": \"2025-10-28T10:55:42.000Z\",\n            \"updated_at\": \"2025-10-28T10:55:42.000Z\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Summary (week/month)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set('PERIOD', pm.environment.get('PERIOD') || 'week');"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status is 200', () => pm.response.to.have.status(200));",
+							"const json = pm.response.json();",
+							"pm.test('Success true', () => pm.expect(json.success).to.eql(true));",
+							"pm.test('Has data array', () => pm.expect(json.data).to.be.an('array'));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{API_KEY}}"
+					}
+				],
+				"url": {
+					"raw": "{{API_URL}}/mood/summary/{{USER_ID}}?period={{PERIOD}}&from={{FROM}}&to={{TO}}",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"mood",
+						"summary",
+						"{{USER_ID}}"
+					],
+					"query": [
+						{
+							"key": "period",
+							"value": "{{PERIOD}}"
+						},
+						{
+							"key": "from",
+							"value": "{{FROM}}"
+						},
+						{
+							"key": "to",
+							"value": "{{TO}}"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Summary (week/month)",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-api-key",
+								"value": "{{API_KEY}}"
+							}
+						],
+						"url": {
+							"raw": "{{API_URL}}/mood/summary/{{USER_ID}}?period={{PERIOD}}&from={{FROM}}&to={{TO}}",
+							"host": [
+								"{{API_URL}}"
+							],
+							"path": [
+								"mood",
+								"summary",
+								"{{USER_ID}}"
+							],
+							"query": [
+								{
+									"key": "period",
+									"value": "{{PERIOD}}"
+								},
+								{
+									"key": "from",
+									"value": "{{FROM}}"
+								},
+								{
+									"key": "to",
+									"value": "{{TO}}"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [
+						{
+							"key": "Content-Security-Policy",
+							"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+						},
+						{
+							"key": "Cross-Origin-Opener-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Cross-Origin-Resource-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Origin-Agent-Cluster",
+							"value": "?1"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "no-referrer"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=15552000; includeSubDomains"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-DNS-Prefetch-Control",
+							"value": "off"
+						},
+						{
+							"key": "X-Download-Options",
+							"value": "noopen"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "X-Permitted-Cross-Domain-Policies",
+							"value": "none"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "RateLimit-Policy",
+							"value": "300;w=900"
+						},
+						{
+							"key": "RateLimit",
+							"value": "limit=300, remaining=297, reset=797"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "121"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"79-7n90P5Wc+h9KWN/9FV0sBc94Wn8\""
+						},
+						{
+							"key": "Date",
+							"value": "Tue, 28 Oct 2025 03:57:26 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"success\": true,\n    \"period\": \"week\",\n    \"data\": [\n        {\n            \"period\": \"2025-W44\",\n            \"entries\": 1,\n            \"avg_mood\": \"4.0000\",\n            \"min_mood\": 4,\n            \"max_mood\": 4\n        }\n    ]\n}"
+				}
+			]
+		}
+	]
+}
